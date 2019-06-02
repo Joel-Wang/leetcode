@@ -1,8 +1,8 @@
-#Leetcode 第1题
+# Leetcode 第1题
 
 [![Travis](https://img.shields.io/badge/language-C++-red.svg)](https://developer.apple.com/.md)
 
-##题目描述
+## 题目描述
 
 给定一个整数数组`nums`和一个目标值`target`，请你在该数组中找出和为目标值的那**两个**整数，并返回他们的下标。
 
@@ -17,7 +17,7 @@
 所以返回 [0, 1]
 ```
 
-##代码实现
+## 代码实现
 
 ```cplusplus
 // 1. Two Sum
