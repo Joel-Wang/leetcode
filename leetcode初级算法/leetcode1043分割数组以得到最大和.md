@@ -1,0 +1,62 @@
+# leetcode1043.分隔数组得到最大和
+
+
+
+## 题目描述
+
+给出整数数组 A，将该数组分隔为长度最多为 K 的几个（连续）子数组。分隔完成后，每个子数组的中的值都会变为该子数组中的最大值。
+
+返回给定数组完成分隔后的最大和。
+
+**示例：**
+
+```
+输入：A = [1,15,7,9,2,5,10], K = 3
+输出：84
+解释：A 变为 [15,15,15,9,10,10,10]
+```
+
+**提示：**
+
+1. `1 <= K <= A.length <= 500`
+2. `0 <= A[i] <= 10^6`
+
+##题目解析
+
+采用动态规划，定义$dp[i]$ 为当前长度数组分隔为最多K个连续子数组的最大值，
+
+1. 当$i<k$ 的时候：定义$submax$ 为当前子数组的最大元素的值，那么$dp[i]$ 就表示为$dp[i]=submax*（i+1)$ ；
+
+2. 当$k<=i<len$ 的时候：同样定义$SubArrayMax$ 为当前$i-SubArraysize+1$ \~ $i$子数组的最大元素，那么当分隔子数组的尺寸从1遍历到k的时候，$dp[i]$ 可以表示为：
+   $$
+   SubArrayMax=max(SubArrayMax,A[i-SubArraysize+1])\\dp[i]=max(dp[i],dp[i-SubArraysize]+SubArrayMax*SubArraysize)
+   $$
+
+
+
+##c++代码
+
+```cplusplus
+class Solution {
+public:
+    int maxSumAfterPartitioning(vector<int>& A, int K) {
+        int len=A.size();
+        if(len==0) return 0;
+        vector<int>dp(len);
+        dp[0]=A[0];
+        int submax=A[0];
+        for(int i=0;i<K;i++){
+            submax=max(submax,A[i]);
+            dp[i]=(i+1)*submax;
+        }
+        for(int i=K;i<len;i++){
+            int SubArrayMax=A[i];
+            for(int SubArraysize=1;SubArraysize<=K;SubArraysize++){
+                SubArrayMax=max(SubArrayMax,A[i-SubArraysize+1]);
+                dp[i]=max(dp[i],dp[i-SubArraysize]+SubArrayMax*SubArraysize);
+            }
+        }
+        return dp[len-1];
+    }
+};
+```
