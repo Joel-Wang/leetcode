@@ -28,9 +28,9 @@
 1. 当$i<k$ 的时候：定义$submax$ 为当前子数组的最大元素的值，那么$dp[i]$ 就表示为$dp[i]=submax*（i+1)$ ；
 
 2. 当$k<=i<len$ 的时候：同样定义$SubArrayMax$ 为当前$i-SubArraysize+1$ \~ $i$子数组的最大元素，那么当分隔子数组的尺寸从1遍历到k的时候，$dp[i]$ 可以表示为：
-   $$
-   SubArrayMax=max(SubArrayMax,A[i-SubArraysize+1])\\dp[i]=max(dp[i],dp[i-SubArraysize]+SubArrayMax*SubArraysize)
-   $$
+
+   $SubArrayMax=max(SubArrayMax,A[i-SubArraysize+1])$
+   $dp[i]=max(dp[i],dp[i-SubArraysize]+SubArrayMax*SubArraysize)$
 
 
 
