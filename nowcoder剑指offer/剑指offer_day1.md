@@ -184,3 +184,172 @@ private:
 };
 ```
 
+
+
+
+
+#### 06 旋转数组的最小数字
+
+把一个数组最开始的若干个元素搬到数组的末尾，我们称之为数组的旋转。输入一个非递减排序的数组的一个旋转，输出旋转数组的最小元素。例如数组{3,4,5,1,2}为{1,2,3,4,5}的一个旋转，该数组的最小值为1。
+NOTE：给出的所有元素都大于0，若数组大小为0，请返回0。
+
+* 二分查找变式，将数组分为两个递增数组，二分查找找到第一个递增数组3 4 5的末尾，和第二个递增数组1 2的开头，则最小值为第二个递增数组的开头，当前后两个指针距离为1时可知是结束了。
+
+```c++
+class Solution {
+public:
+    int minNumberInRotateArray(vector<int> rotateArray) {
+        if(rotateArray.size()==0) return 0;
+        int left=0,right=rotateArray.size()-1,mid=0;
+        while(rotateArray[left]>=rotateArray[right]){
+            if(right-left==1){
+                mid=right;break;
+            }
+            mid=left+(right-left)/2;
+            if(rotateArray[left]==rotateArray[right] && rotateArray[left]==rotateArray[mid]){
+                return inorder(rotateArray);
+            }
+            if(rotateArray[left]<=rotateArray[mid]){
+                left=mid;
+            }else{
+                right=mid;
+            }
+        }
+        return rotateArray[mid];
+    }
+    int inorder(vector<int> rotateArray){
+        int res=rotateArray[0];
+        for(int i=0;i<rotateArray.size();i++){
+            if(res>rotateArray[i])
+                res=rotateArray[i];
+        }
+        return res;
+    }
+};
+```
+
+
+#### 07 斐波那契数列
+大家都知道斐波那契数列，现在要求输入一个整数n，请你输出斐波那契数列的第n项（从0开始，第0项为0）。n<=39、
+
+* 最节省时间和空间，循环，O(n) time,O(1) space
+
+```c++
+class Solution {
+public:
+    int Fibonacci(int n) {
+        int a=0,b=1;
+        for(int i=0;i<n;i++){
+            b=a+b,a=b-a;
+        }
+        return a;
+    }
+};
+```
+* 递归法：2^n复杂度，超时
+
+```c++
+class Solution {
+public:
+    int Fibonacci(int n) {
+        if(n==0) return 0;
+        if(n==1) return 1;
+        return Fibonacci(n-1)+Fibonacci(n-2);
+    }
+};
+```
+
+#### 07跳台阶
+一只青蛙一次可以跳上1级台阶，也可以跳上2级。求该青蛙跳上一个n级的台阶总共有多少种跳法（先后次序不同算不同的结果）。
+```c++
+class Solution {
+public:
+    int jumpFloor(int number) {
+        if(number<=1) return number;
+        int a=0,b=1;
+        for(int i=0;i<=number;i++){
+            b=a+b;
+            a=b-a;
+        }
+        return a;
+    }
+};
+```
+
+#### 08变态跳台阶
+一只青蛙一次可以跳上1级台阶，也可以跳上2级……它也可以跳上n级。求该青蛙跳上一个n级的台阶总共有多少种跳法。
+* 按贪心算法，每个台阶的跳法等于之前的总和；
+
+```c++
+class Solution {
+public:
+    int jumpFloorII(int number) {
+        if(number>1){
+            int tmp=0;
+            for(int i=2;i<=number;i++){
+                tmp=0;
+                for(int j=0;j<i;j++){
+                    tmp+=steps[j];
+                }
+                steps.push_back(tmp);
+            }
+        }
+        return steps[number];
+    }
+private:
+    vector<int> steps={1,1};
+};
+```
+* 但实际这道题有规律，答案为2的n-1次方，计算出来就可以；
+
+```c++
+class Solution {
+public:
+    int jumpFloorII(int number) {
+        if(number<=2) return number;
+        int res=2;
+        for(int i=2;i<number;i++){
+            res<<=1;
+        }
+        return res;
+    }
+};
+```
+
+#### 09矩形覆盖
+我们可以用2 * 1的小矩形横着或者竖着去覆盖更大的矩形。请问用n个2 * 1的小矩形无重叠地覆盖一个2 * n 的大矩形，总共有多少种方法？
+* 仍然是斐波那契数列的间接形式，可以打表找规律，也可以递归；
+
+```c++
+class Solution {
+public:
+    int rectCover(int number) {
+        int a=1,b=2;
+        if(number<=2) return number;
+        for(int i=2;i<number;i++){
+            b=a+b;
+            a=b-a;
+        }
+        return b;
+    }
+};
+```
+#### 10二进制中1的个数
+输入一个整数，输出该数二进制表示中1的个数。其中负数用补码表示。
+* 包括负数
+* 负数算1时包括符号位，也就是说-1的二进制表示包含32个1
+* 负数右移会在最左边符号位补1，如果负数右移操作最终会变为111111111...
+* n=n&(n-1)即消去二进制数最右边的1；
+```c++
+class Solution {
+public:
+     int  NumberOf1(int n) {
+         int cnt=0;
+         while(n){
+             n=n&(n-1);
+             cnt++;
+         }
+         return cnt;
+     }
+};
+```
