@@ -302,3 +302,109 @@ public:
 };
 ```
 
+#### 18顺时针打印矩阵
+
+输入一个矩阵，按照从外向里以顺时针的顺序依次打印出每一个数字，例如，如果输入如下4 X 4矩阵： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 则依次打印出数字1,2,3,4,8,12,16,15,14,13,9,5,6,7,11,10.
+
+* 使用普通的循环
+* 利用图遍历的思想
+
+```c++
+class Solution {
+public:
+    vector<vector<int> > dirs={{0,1},{1,0},{0,-1},{-1,0}};
+    vector<int> printMatrix(vector<vector<int> > matrix) {
+        int m=matrix.size();
+        if(m==0) return {};
+        int n=matrix[0].size();
+        if(n==0) return {};
+        vector<vector<int> > visit(m,vector<int>(n,0));
+        int len=(min(m,n)+1)/2;
+        int x=0,y=0;
+        vector<int> res;
+        res.push_back(matrix[x][y]);
+        visit[x][y]=1;
+        for(int i=0;i<len;i++){
+            for(int j=0;j<4;j++){
+                int dx=dirs[j][0],dy=dirs[j][1];
+                while(x+dx>=0 && x+dx<m && y+dy>=0 && y+dy<n && visit[x+dx][y+dy]==0){
+                    x=x+dx;y=y+dy;
+                    res.push_back(matrix[x][y]);
+                    visit[x][y]=1;
+                }
+            }
+        }
+        return res;
+    }
+};
+```
+
+#### 19 包含min函数的栈
+
+定义栈的数据结构，请在该类型中实现一个能够得到栈中所含最小元素的min函数（时间复杂度应为O（1））。
+
+* 采用一个辅助的min栈来帮助存储数据的data栈存储最小值；
+
+* 例如：  data栈 依次入栈元素 5,   4,   3,   8,   10,   11,   12,   1；
+
+  ​               min栈 依次入栈元素 5， 4,   3，3,    3，  3，   3， 1。
+
+  出栈时，min的栈与栈data均要出栈。
+
+```c++
+class Solution {
+public:
+    void push(int value) {
+        s.push(value);
+        if(help.empty()){
+            help.push(value);
+        }
+        if(value<help.top()){
+            help.push(value);
+        }else{
+            help.push(help.top());
+        }
+    }
+    void pop() {
+        s.pop();
+        help.pop();
+    }
+    int top() {
+        return s.top();
+    }
+    int min() {
+        return help.top();
+    }
+private:
+    stack<int> s;
+    stack<int> help;
+};
+```
+
+
+
+#### 20栈的压入、弹出序列
+
+输入两个整数序列，第一个序列表示栈的压入顺序，请判断第二个序列是否可能为该栈的弹出顺序。假设压入栈的所有数字均不相等。例如序列1,2,3,4,5是某栈的压入顺序，序列4,5,3,2,1是该压栈序列对应的一个弹出序列，但4,3,5,1,2就不可能是该压栈序列的弹出序列。（注意：这两个序列的长度是相等的）
+
+```c++
+class Solution {
+public:
+    bool IsPopOrder(vector<int> pushV,vector<int> popV) {
+        stack<int> s;
+        int i=0,j=0,len=pushV.size();
+        while(j<len && i<len){
+            s.push(pushV[i++]);
+            while(i<len && s.top()!=popV[j]){
+                s.push(pushV[i++]);
+            }
+            while(j<len && !s.empty() && s.top()==popV[j]){
+                s.pop();
+                j++;
+            }
+        }
+        return s.empty();
+    }
+};
+```
+
