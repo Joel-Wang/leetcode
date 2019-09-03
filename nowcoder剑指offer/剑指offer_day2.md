@@ -213,3 +213,92 @@ public:
 };
 ```
 
+#### 16 判断树的子结构
+
+输入两棵二叉树A，B，判断B是不是A的子结构。（ps：我们约定空树不是任意一个树的子结构）
+
+* 先层序遍历寻找可能的根节点，然后层序遍历比较，注意，当B树存在节点时才可push A的节点；
+
+```c++
+/*
+struct TreeNode {
+	int val;
+	struct TreeNode *left;
+	struct TreeNode *right;
+	TreeNode(int x) :
+			val(x), left(NULL), right(NULL) {
+	}
+};*/
+class Solution {
+public:
+    bool HasSubtree(TreeNode* pRoot1, TreeNode* pRoot2)
+    {
+        bool res=false;
+        queue<TreeNode*> q;
+        TreeNode *p1=pRoot1,*p2=pRoot2;
+        if(p1==NULL || p2==NULL) return res;
+        q.push(p1);
+        while(!q.empty()){
+            TreeNode *front=q.front();
+            
+            if(front->val==p2->val){
+                res=cmp(front,p2);
+            }
+            if(res==true) return res;
+            q.pop();
+            if(front->left!=NULL) q.push(front->left);
+            if(front->right!=NULL) q.push(front->right);
+        }
+        return res;
+    }
+    bool cmp(TreeNode *p1, TreeNode *p2){
+        queue<TreeNode*> q1,q2;
+        q1.push(p1),q2.push(p2);
+        while(!q1.empty()&& !q2.empty()){
+            TreeNode *f1=q1.front(),*f2=q2.front();
+            if(f1->val!=f2->val) return false;
+            q1.pop(),q2.pop();
+            if(f2->left!=NULL && f1->left!=NULL) q1.push(f1->left);
+            if(f2->right!=NULL && f1->right!=NULL) q1.push(f1->right);
+            if(f2->left!=NULL) q2.push(f2->left);
+            if(f2->right!=NULL) q2.push(f2->right);
+        }
+        if(q2.empty()) return true;
+    }
+};
+```
+
+#### 17镜像二叉树
+
+```c++
+/*
+struct TreeNode {
+	int val;
+	struct TreeNode *left;
+	struct TreeNode *right;
+	TreeNode(int x) :
+			val(x), left(NULL), right(NULL) {
+	}
+};*/
+class Solution {
+public:
+    void Mirror(TreeNode *pRoot) {
+        if(pRoot==NULL) return;
+        TreeNode *p=pRoot;
+        queue<TreeNode*> q;
+        q.push(p);
+        while(!q.empty()){
+            TreeNode* front=q.front();
+            q.pop();
+            
+            TreeNode* left=front->left;
+            TreeNode* right=front->right;
+            if(left!=NULL) q.push(left);
+            if(right!=NULL) q.push(right);
+            front->left=right;
+            front->right=left;
+        }
+    }
+};
+```
+
