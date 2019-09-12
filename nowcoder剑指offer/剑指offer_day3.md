@@ -37,9 +37,35 @@ public:
 
 输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历的结果。如果是则输出Yes,否则输出No。假设输入的数组的任意两个数字都互不相同。
 
-
+* 直接使用递归，但这种对空的没法判断，简单办法是先判断是否空，然后在另一个函数递归；
 
 ```c++
+class Solution {
+public:
+    bool VerifySquenceOfBST(vector<int> sequence) {
+        if(sequence.size()==0) return false;
+        if(sequence.size()<=2) return true;
+        return isBST(sequence);
+    }
+    bool isBST(vector<int> sequence){
+        if(sequence.size()<=2) return true;
+        
+        int flag=1,i=0,pivot=sequence[sequence.size()-1];
+        vector<int> right,left;
+        while(i<sequence.size()-1&&sequence[i]<pivot){
+            right.push_back(sequence[i]);
+            i++;
+        }
 
+        while(i<sequence.size()-1&&sequence[i]>pivot){
+            left.push_back(sequence[i]);
+            i++;
+        }
+        if(i!=sequence.size()-1)
+            return false;
+        else
+            return isBST(left)&&isBST(right);
+    }
+};
 ```
 
