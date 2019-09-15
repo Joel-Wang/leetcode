@@ -205,4 +205,117 @@ public:
 };
 ```
 
-* ​
+* O(n) time，O(1) space；先在每个节点后面插入节点，然后对链表的random进行复制，然后拆开链表；
+
+```c++
+/*
+struct RandomListNode {
+    int label;
+    struct RandomListNode *next, *random;
+    RandomListNode(int x) :
+            label(x), next(NULL), random(NULL) {
+    }
+};
+*/
+class Solution {
+public:
+    RandomListNode* Clone(RandomListNode* pHead)
+    {
+        if(pHead==NULL) return NULL;//当pHead为NULL 后面很多表达都会出问题，所以需要先列出来；
+        //不使用辅助空间达到O(n) time
+        RandomListNode* p = pHead;
+
+        //插入节点
+        while(p!=NULL){
+            RandomListNode* cur = p->next;
+            RandomListNode* newNode = new RandomListNode(p->label);
+            p->next=newNode;
+            newNode->next=cur;
+            p=cur;
+            
+        }
+        //链接random
+        p=pHead;
+        while(p!=NULL){
+            RandomListNode* newNode = p->next;
+            RandomListNode* tar=p->random;
+            if(tar!=NULL) newNode->random=tar->next;
+            p=newNode->next;
+        }
+        
+        //拆开链表
+        RandomListNode* tmp;
+        RandomListNode* pHead2=pHead->next;
+        p=pHead;
+        while(p->next!=NULL){
+            tmp=p->next;
+            p->next=tmp->next;
+            p=tmp;
+        }
+        return pHead2;
+    }
+};
+```
+
+将其整合一下，然后封装成函数：
+
+![复制复杂链表01](E:\Github\leetcode\nowcoder剑指offer\复制复杂链表01.png)
+
+```c++
+/*
+struct RandomListNode {
+    int label;
+    struct RandomListNode *next, *random;
+    RandomListNode(int x) :
+            label(x), next(NULL), random(NULL) {
+    }
+};
+*/
+class Solution {
+public:
+    RandomListNode* Clone(RandomListNode* pHead)
+    {
+        if(pHead==NULL) return NULL;//排除NULL，以后函数中不用考虑为空；
+        CloneNode(pHead);
+        ConnectRandom(pHead);
+        return ReconnectNodes(pHead);
+        
+    }
+    void CloneNode(RandomListNode* pHead){
+        RandomListNode* pNode=pHead;
+        while(pNode!=NULL){
+            RandomListNode* pCloned=new RandomListNode(pNode->label);
+            pCloned->next=pNode->next;
+            
+            pNode->next=pCloned;
+            pNode=pCloned->next;
+        }
+    }
+    void ConnectRandom(RandomListNode* pHead){
+        RandomListNode* pNode=pHead;
+        while(pNode!=NULL){
+            RandomListNode* pCloned=pNode->next;
+            if(pNode->random!=NULL){
+                pCloned->random=pNode->random->next;
+            }
+            pNode=pCloned->next;
+        }
+    }
+    RandomListNode* ReconnectNodes(RandomListNode* pHead){
+        RandomListNode* curNode=pHead;
+        RandomListNode* pHead2=pHead->next;
+        RandomListNode* tmp;
+        while(curNode->next!=NULL){
+            tmp=curNode->next;
+            curNode->next=tmp->next;
+            curNode=tmp;
+        }
+        return pHead2;
+    }
+};
+```
+
+#### 25二叉搜索树与双向链表
+
+输入一棵二叉搜索树，将该二叉搜索树转换成一个排序的双向链表。要求不能创建任何新的结点，只能调整树中结点指针的指向。
+
