@@ -319,3 +319,153 @@ public:
 
 输入一棵二叉搜索树，将该二叉搜索树转换成一个排序的双向链表。要求不能创建任何新的结点，只能调整树中结点指针的指向。
 
+* 使用一个queue存储中序遍历的结果，然后记录头结点，按照从左到右递增的顺序重新连接；需要O(n)的空间(队列存储节点指针），遍历二叉树需要O(n)时间
+
+```c++
+/*
+struct TreeNode {
+	int val;
+	struct TreeNode *left;
+	struct TreeNode *right;
+	TreeNode(int x) :
+			val(x), left(NULL), right(NULL) {
+	}
+};*/
+class Solution {
+public:
+    TreeNode* Convert(TreeNode* pRootOfTree)
+    {
+        //用队列,从左到右为递增（也就是right指针指向的值都更大）
+        queue<TreeNode*> q;
+        if(pRootOfTree==NULL || (pRootOfTree->left==NULL&&pRootOfTree->right==NULL)) return pRootOfTree;
+        
+        inorder(pRootOfTree,q);
+        TreeNode *a,*b,*pHead;
+        b=q.front();pHead=q.front();q.pop();
+        while(!q.empty()){
+            a=b;b=q.front();q.pop();
+            a->right=NULL;b->left=NULL;
+            
+            a->right=b;
+            b->left=a;
+        }
+        return pHead;
+    }
+    void inorder(TreeNode* root,queue<TreeNode*> &q){
+        if(root==NULL) return;
+        inorder(root->left,q);
+        q.push(root);
+        inorder(root->right,q);
+    }
+};
+```
+
+* 不使用队列，直接使用递归的方法，采用中序遍历，对得到的pLastNode和当前Node的连接进行改变；然后对左子树和柚子树分别递归操作；
+
+```c++
+/*
+struct TreeNode {
+	int val;
+	struct TreeNode *left;
+	struct TreeNode *right;
+	TreeNode(int x) :
+			val(x), left(NULL), right(NULL) {
+	}
+};*/
+class Solution {
+public:
+    TreeNode* Convert(TreeNode* pRootOfTree){
+        TreeNode *pLastNode=NULL;
+        ConvertNode(pRootOfTree,&pLastNode);
+        TreeNode *pHeadOfList=pLastNode;
+        while(pHeadOfList != NULL && pHeadOfList->left!=NULL){
+            pHeadOfList=pHeadOfList->left;
+        }
+        return pHeadOfList;
+    }
+    void ConvertNode(TreeNode *pNode,TreeNode **pLastNode){
+        //使用**pLastNode,pLastNode为指向指针的指针；方便最后记录末节点以及寻找头结点；
+        if(pNode==NULL) return;
+        TreeNode *pCurNode=pNode;
+        if(pCurNode->left!=NULL)
+            ConvertNode(pCurNode->left,pLastNode);
+        
+        pCurNode->left=*pLastNode;
+        if(*pLastNode!=NULL)
+            (*pLastNode)->right=pCurNode;
+        *pLastNode=pCurNode;
+        
+        if(pCurNode->right!=NULL)
+            ConvertNode(pCurNode->right,pLastNode);
+    }
+};
+```
+
+#### 26字符串的排列
+
+输入一个字符串,按字典序打印出该字符串中字符的所有排列。例如输入字符串abc,则打印出由字符a,b,c所能排列出来的所有字符串abc,acb,bac,bca,cab和cba。
+输入描述:
+
+>输入一个字符串,长度不超过9(可能有字符重复),字符只包括大小写字母。
+
+* 直接使用库函数sort和next_permutation,都可以对数组，vector,string进行排序和排列，使用方式为 func(左迭代器，右迭代器，比较函数（不写默认从小到大）)；如string a="CBA"；next_permutation(a.begin(),a.end())，其中区间为[ , )；对CBA执行此操作为ABC，重新升序，因此返回false;
+
+```c++
+class Solution {
+public:
+    vector<string> Permutation(string str) {
+        if(str.size()==0) return {};
+        sort(str.begin(),str.end());
+        vector<string> res;
+        string origin=str;
+        res.push_back(str);
+        while(next_permutation(str.begin(),str.end())){
+            res.push_back(str);
+        }
+        return res;
+    }
+};
+```
+
+* **递归求全排列**：使用递归的思想，将大问题分解为小问题：即划分为，将第一个字母与任意一个不同的字母交换（包括自己），然后固定第一个字母，对后面的也采用这样的操作，直到结束；（这样缺点是没有字典序，需要再自己实现按字典序排序；
+
+```c++
+class Solution {
+public:
+    vector<string> Permutation(string str) {
+        if(str.size()==0) return {};
+        sort(str.begin(),str.end());
+        vector<string> res;
+        per(str,0,res);
+        return res;
+    }
+    //判断是否能够交换，（出现重复返回false,不重复可以交换返回true）
+    bool is_swap(string str,int start,int end){
+        for(int i=start;i<end;i++){
+            if(str[i]==str[end])
+                return false;
+        }
+        return true;
+    }
+    void per(string str,int id,vector<string>& res){
+        if(id==str.size()){
+            res.push_back(str);
+            return;
+        }
+        for(int i=id;i<str.size();i++){
+            if(str[i]==str[id] && i!=id) continue;
+            if(i>id && !is_swap(str,id,i)) continue;
+            char tmp=str[i];
+            str[i]=str[id];
+            str[id]=tmp;
+            per(str,id+1,res);
+            tmp=str[i];
+            str[i]=str[id];
+            str[id]=tmp;
+        }
+    }
+};
+```
+
+#### 27数组中出现次数超过一半的数字
+
