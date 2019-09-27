@@ -427,7 +427,7 @@ public:
 };
 ```
 
-* **递归求全排列**：使用递归的思想，将大问题分解为小问题：即划分为，将第一个字母与任意一个不同的字母交换（包括自己），然后固定第一个字母，对后面的也采用这样的操作，直到结束；（这样缺点是没有字典序，需要再自己实现按字典序排序；
+* **递归求全排列**：使用递归的思想，将大问题分解为小问题：即划分为，将第一个字母与任意一个不同的字母交换（包括自己），然后固定第一个字母，对后面的也采用这样的操作，直到结束；（这样缺点是没有字典序，需要再自己对得到的序列进行排序；
 
 ```c++
 class Solution {
@@ -437,6 +437,7 @@ public:
         sort(str.begin(),str.end());
         vector<string> res;
         per(str,0,res);
+        sort(res.begin(),res.end());//使得输出按字典序排序
         return res;
     }
     //判断是否能够交换，（出现重复返回false,不重复可以交换返回true）
@@ -467,5 +468,89 @@ public:
 };
 ```
 
+* 直接递归全排列为字典序：取消递归之后的复位操作，从而直接输出字典序；
+
+```c++
+class Solution {
+public:
+    vector<string> Permutation(string str) {
+        if(str.size()==0) return {};
+        sort(str.begin(),str.end());
+        vector<string> res;
+        per(str,0,res);
+ 
+        return res;
+    }
+    //判断是否能够交换，（出现重复返回false,不重复可以交换返回true）
+    bool is_swap(string str,int start,int end){
+        for(int i=start;i<end;i++){
+            if(str[i]==str[end])
+                return false;
+        }
+        return true;
+    }
+    void per(string str,int id,vector<string>& res){
+        if(id==str.size()){
+            res.push_back(str);
+            return;
+        }
+        for(int i=id;i<str.size();i++){
+            if(str[i]==str[id] && i!=id) continue;
+            if(i>id && !is_swap(str,id,i)) continue;
+            char tmp=str[i];
+            str[i]=str[id];
+            str[id]=tmp;
+            per(str,id+1,res);
+
+        }
+    }
+};
+```
+
+
+
 #### 27数组中出现次数超过一半的数字
+
+数组中有一个数字出现的次数超过数组长度的一半，请找出这个数字。例如输入一个长度为9的数组{1,2,3,2,2,2,5,4,2}。由于数字2在数组中出现了5次，超过数组长度的一半，因此输出2。如果不存在则输出0。
+
+* 不改变原数组：
+
+```c++
+class Solution {
+public:
+    //哈希，O(n) space O(n) time;
+    //摩尔投票， O(1） space O（n）time;
+    bool check(vector<int> & numbers,int x){
+        //检验输入数组是否有效
+        int len=numbers.size();
+        int cnt=0;
+        for(int i=0;i<len;i++){
+            if(numbers[i]==x) cnt++;
+        }
+        if(cnt*2>len)
+            return true;
+        else
+            return false;
+    }
+    int MoreThanHalfNum_Solution(vector<int> numbers) {
+        if(numbers.size()==0) return 0;
+        int flag=1,v=numbers[0];
+        for(int i=0;i<numbers.size();i++){
+            if(v!=numbers[i])
+                flag--;
+            else
+                flag++;
+            if(flag==0){
+                flag=1;v=numbers[i];
+            }
+        }
+        if(check(numbers,v))
+            return v;
+        else
+            return 0;
+    }
+};
+```
+
+* 改变原数组，快速排序partition的思想
 
