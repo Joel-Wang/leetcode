@@ -552,5 +552,147 @@ public:
 };
 ```
 
-* 改变原数组，快速排序partition的思想
+* 改变原数组，快速排序partition的思想（与28题类似）
+
+
+```c++
+待补充
+```
+
+
+
+#### 28最小的k个数
+
+输入n个整数，找出其中最小的K个数。例如输入4,5,1,6,2,7,3,8这8个数字，则最小的4个数字是1,2,3,4,。
+
+* 大顶堆，使用vector作为大顶堆的容器；time O(nlogk)
+
+```c++
+class Solution {
+public:
+    void heapfiy(vector<int> &heap,int j){
+        int len=heap.size();
+        int tar=j;
+        while(2*j+1<len){
+            if(heap[2*j+1]>heap[tar]){
+                tar=2*j+1;
+            }
+            if(2*j+2<len && heap[2*j+2]>heap[tar]){
+                tar=2*j+2;
+            }
+            if(tar==j) break;
+            int tmp=heap[tar];
+            heap[tar]=heap[j];
+            heap[j]=tmp;
+            j=tar;
+        }
+    }
+    void buildheap(vector<int> &heap){
+        int len=(heap.size()-2)/2;
+        for(int i=len;i>=0;i--){
+            heapfiy(heap,i);
+        }
+    }
+    vector<int> GetLeastNumbers_Solution(vector<int> input, int k) {
+        if(k<=0 || k>input.size()) return {};
+        vector<int> heap(k,0);
+        for(int i=0;i<k;i++){
+            heap[i]=input[i];
+        }
+        buildheap(heap);
+        for(int i=k;i<input.size();i++){
+            if(input[i]<heap[0]){
+                heap[0]=input[i];
+                heapfiy(heap,0);
+            }
+        }
+        return heap;
+    }
+};
+```
+
+* 排序：quicksort, mergesort等；time O(nlogn)；
+
+```c++
+class Solution {
+public:
+    int partition(vector<int> &input,int start,int end){
+        int pivot=input[start];
+        int i=start,j=end;
+
+        while(i<j){
+            while(i<j && input[j]>=pivot)
+                j--;
+            input[i]=input[j];
+            while(i<j && input[i]<=pivot)
+                i++;
+            input[j]=input[i];
+        }
+        input[i]=pivot;
+        return i;
+    }
+    void quickSort(vector<int> &input,int start,int end){
+        if(start>=end) return;
+        int pivotkey=partition(input,start,end);
+        quickSort(input,start,pivotkey-1);
+        quickSort(input,pivotkey+1,end);
+    }
+    vector<int> GetLeastNumbers_Solution(vector<int> input, int k) {
+        if(k<=0 || k>input.size()) return{};
+        quickSort(input,0,input.size()-1);
+        vector<int> tmp;
+        for(int i=0;i<k;i++){
+            tmp.push_back(input[i]);
+        }
+        return tmp;
+    }
+};
+```
+
+* 快速排序的思想：partition的思想，当partition的key值刚好下标为k时，说明左侧即为最小的k个数；结合二分查找法，逼近所在的区间；这应该是本题最快的解法；O(logn)时间复杂度；
+
+```c++
+class Solution {
+public:
+    int partition(vector<int> &input,int start,int end){
+        int pivot=input[start];
+        int i=start,j=end;
+        while(i<j){
+            while(i<j && input[j]>=pivot)
+                j--;
+            input[i]=input[j];
+            while(i<j && input[i]<=pivot)
+                i++;
+            input[j]=input[i];
+        }
+        input[i]=pivot;
+        return i;
+    }
+    vector<int> GetLeastNumbers_Solution(vector<int> input, int k) {
+        if(k<=0 || k>input.size()) return {};
+        int i=0,j=input.size()-1;
+        int pivotkey;
+        while(i<j){
+            pivotkey=partition(input,i,j);
+            if(k==pivotkey) break;
+            if(k<pivotkey){
+                j=pivotkey-1;
+            }else{
+                i=pivotkey+1;
+            }
+        }
+        vector<int> tmp;
+        for(int i=0;i<k;i++){
+            tmp.push_back(input[i]);
+        }
+        return tmp;
+    }
+};
+```
+
+#### 29 连续子数组的最大和
+
+HZ偶尔会拿些专业问题来忽悠那些非计算机专业的同学。今天测试组开完会后,他又发话了:在古老的一维模式识别中,常常需要计算连续子向量的最大和,当向量全为正数的时候,问题很好解决。但是,如果向量中包含负数,是否应该包含某个负数,并期望旁边的正数会弥补它呢？例如:{6,-3,-2,7,-15,1,2,2},连续子向量的最大和为8(从第0个开始,到第3个为止)。给一个数组，返回它的最大连续子序列的和，你会不会被他忽悠住？(子向量的长度至少是1)
+
+
 
