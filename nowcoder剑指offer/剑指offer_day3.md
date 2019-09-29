@@ -767,6 +767,71 @@ public:
 };
 ```
 
+* 上述算法可以稍微优化一下：
+
+> 初始值：sum=0, res=array[0]，sum代表以i结尾的最大子数组的和
+>
+> 对于sum[i]，当sum[i-1]>0时，以i结尾的最大子数组的和是sum[i-1]+array[i]; 当sum[i-1]<0时，sum[i]=array[i];
+>
+> > for i=0~n-1:
+> >
+> > ​	1, 当sum<0时，说明0~i-1子数组以i-1元素结尾的最大子数组的和小于零，因此不用考虑i-1及其之前的元素；sum=array[i];
+> >
+> > ​	2, 当sum>=0是，说明将以i-1结尾的最大字数组的和与array[i]相加一定是更大的，因此sum=array[i]+sum;
+
+即动态规划的表达式：
+
+```
+初始值：sum=0,res=array[0]
+for i = 0 ~ n-1:
+	sum[i]=max(sum[i-1]+array[i],array[i]);
+	res=max(sum[i],res);
+```
+
+```c++
+class Solution {
+public:
+    //O(n)
+    int FindGreatestSumOfSubArray(vector<int> array) {
+        int len=array.size();
+        if(len==0) return 0;
+        int sum=0, res=array[0];
+        for(int i=0;i<len;i++){
+            if(sum<0)
+                sum=array[i];
+            else
+                sum+=array[i];
+            res=res>sum?res:sum;
+        }
+        return res;
+    }
+};
+```
+
+
+
 #### 30整数中1出现的次数
 
 求出1到13的整数中1出现的次数,并算出100到1300的整数中1出现的次数。为此他特别数了一下1到13中包含1的数字有1、10、11、12、13因此共出现6次,但是对于后面问题他就没辙了。ACMer希望你们帮帮他,并把问题更加普遍化,可以很快的求出任意非负整数区间中1出现的次数（从1 到 n 中1出现的次数）。
+
+```
+class Solution {
+public:
+    //time O(logn)
+    int NumberOf1Between1AndN_Solution(int n){
+        int base = 1,res=0;
+        if(n<=0) return 0;
+        int a,b;
+        while(base<=n){
+            cout<<"base,n:"<<base<<","<<n<<endl;
+            a=n/base,b=n%base;
+            cout<<a<<","<<b<<endl;
+            res+=(a+8)/10*base;
+            res+=(a%10==1) && (b+1);
+            base*=10;
+        }
+        return res;
+    }
+};
+```
+
