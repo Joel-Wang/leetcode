@@ -694,5 +694,79 @@ public:
 
 HZ偶尔会拿些专业问题来忽悠那些非计算机专业的同学。今天测试组开完会后,他又发话了:在古老的一维模式识别中,常常需要计算连续子向量的最大和,当向量全为正数的时候,问题很好解决。但是,如果向量中包含负数,是否应该包含某个负数,并期望旁边的正数会弥补它呢？例如:{6,-3,-2,7,-15,1,2,2},连续子向量的最大和为8(从第0个开始,到第3个为止)。给一个数组，返回它的最大连续子序列的和，你会不会被他忽悠住？(子向量的长度至少是1)
 
+*  最简单的想法是将每个i到j下标之间的数字加起来，然后与最大值比较，这样遍历的次数为n(n+1)/2；然后每次加起来的平均复杂度n/2；因此总的世间复杂度为O(n3) ,space O(1);
+* 采用mem记忆矩阵可以将之前所求和存储起来，此时时间O(n2), spaceO(n2);
+
+```c++
+class Solution {
+public:
+    //time O(n2),space O(n2)
+    int FindGreatestSumOfSubArray(vector<int> array) {
+        int n=array.size();
+        if(n==0) return 0;
+        int res=array[0];
+        vector<vector<int>> mem(n,vector<int>(n,0));
+        for(int i=0;i<n;i++){
+            mem[i][i]=array[i];
+        }
+        for(int i=0;i<n;i++){
+            for(int j=i;j<n;j++){
+                if(i==j)
+                    mem[i][j]=array[i];
+                else
+                    mem[i][j]=mem[i][j-1]+array[j];
+                if(mem[i][j]>res) res=mem[i][j];
+            }
+        }
+        return res;
+    }
+};
+```
+
+* 采用动态规划的思想 time O(n)，space O(1)，遍历一遍，sum初始化为0，当之前的 连续最大和与当前值相加，如果是正数，那么证明继续相加有可能达到更大值，如果是负数，则后面的最大值计算不需要前面的数字（因为前面的和为负数，与后面相加会使得最大值变小，因此sum赋值为0，考虑全负的情况，此时res应该与当前值进行比较，而不是与sum比较；
+
+伪代码：
+
+```c++
+初始值sum=0; res=array[0];
+
+for i: 0 ---->len-1:
+    //以当前数结尾的子序列的最大值sum更新；
+	情况1： sum+array[i]>0: sum=sum+array[i];
+	情况2： sum+array[i]<=0: sum=0;
+	
+    //以当前数结尾的数组最大子序列和的结果res更新
+	情况1： 当sum==0时，res= max(res, array[i]);
+	情况2： 当sum>0 时，res=max(res, sum);
+```
 
 
+
+```c++
+class Solution {
+public:
+    //O(n)
+    int FindGreatestSumOfSubArray(vector<int> array) {
+        int len=array.size();
+        if(len==0) return 0;
+        int sum=0;
+
+        int res=array[0];
+        for(int i=0;i<len;i++){
+            if(sum+array[i]<0)
+                sum=0;
+            else
+                sum+=array[i];
+            if(sum==0)
+                res=res>array[i]? res:array[i];
+            else
+                res=res>sum?res:sum;
+        }
+        return res;
+    }
+};
+```
+
+#### 30整数中1出现的次数
+
+求出1~13的整数中1出现的次数,并算出100~1300的整数中1出现的次数？为此他特别数了一下1~13中包含1的数字有1、10、11、12、13因此共出现6次,但是对于后面问题他就没辙了。ACMer希望你们帮帮他,并把问题更加普遍化,可以很快的求出任意非负整数区间中1出现的次数（从1 到 n 中1出现的次数）。
