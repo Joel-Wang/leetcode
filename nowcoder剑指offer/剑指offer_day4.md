@@ -118,11 +118,97 @@ public:
 };
 ```
 
+#### 34 数组中的逆序对
 
+>题目描述
+>在数组中的两个数字，如果前面一个数字大于后面的数字，则这两个数字组成一个逆序对。输入一>个数组,求出这个数组中的逆序对的总数P。并将P对1000000007取模的结果输出。 即输出>P%1000000007
+>输入描述:
+>题目保证输入的数组中没有的相同的数字
+>
+>数据范围：
+>
+>	对于%50的数据,size<=10^4
+>	对于%75的数据,size<=10^5
+>	对于%100的数据,size<=2*10^5
+>
+>示例1
+>输入
+>1,2,3,4,5,6,7,0
+>输出
+>7
 
+* 递归，归并排序的变式 time O(nlogn) space O(n)
+```c++
+class Solution {
+public:
+    void Merge(vector<int> &data,int start,int mid,int end){
+        vector<int> tmp;
+        int i,j;
+        i=start,j=mid+1;
+        while(i<=mid && j<=end){
+            if(data[i]>data[j])
+                cnt+=end-j+1;
+            if(cnt>=1000000007) cnt=cnt%1000000007;
+            int val = data[i]>data[j]?data[i++]:data[j++];
+            tmp.push_back(val);
+        }
+        while(i<=mid)
+            tmp.push_back(data[i++]);
+        while(j<=end)
+            tmp.push_back(data[j++]);
+        for(int k=0;k<tmp.size();k++){
+            data[start+k]=tmp[k];
+        }
+    }
+    void MergeCount(vector<int>& data,int start, int end){
+        if(start>=end) return;
+        int mid=start+(end-start)/2;
+        MergeCount(data,start,mid);
+        MergeCount(data,mid+1,end);
+        Merge(data,start,mid,end);
+    }
+    int InversePairs(vector<int> data) {
+        cnt=0;
+        MergeCount(data,0,data.size()-1);
+        return cnt;
+    }
+private:
+    int cnt;
+};
+```
 
+#### 35 两个链表的第一个公共节点
 
-#### 35数字在排序数组中出现的次数
+输入两个链表，找出它们的第一个公共结点。
+
+* 双指针法
+
+```c++
+/*
+struct ListNode {
+	int val;
+	struct ListNode *next;
+	ListNode(int x) :
+			val(x), next(NULL) {
+	}
+};*/
+class Solution {
+public:
+    ListNode* FindFirstCommonNode( ListNode* pHead1, ListNode* pHead2) {
+        if(pHead1==NULL || pHead2==NULL) return NULL;
+        ListNode* p1=pHead1;
+        ListNode* p2=pHead2;
+        while(!(p1==NULL && p2==NULL)){
+            if(p1==p2) return p1;
+            p1 = (p1==NULL)? pHead2 : p1->next;
+            p2 = (p2==NULL)? pHead1 : p2->next;
+        }
+        return NULL;
+    }
+};
+```
+
+#### 36 数字在排序数组中出现的次数
 
 统计一个数字在排序数组中出现的次数。
 
@@ -154,4 +240,125 @@ public:
     }
 };
 ```
+
+#### 37二叉树的深度
+
+输入一棵二叉树，求该树的深度。从根结点到叶结点依次经过的结点（含根、叶结点）形成树的一条路径，最长路径的长度为树的深度。
+
+* 二叉树递归遍历的变式1
+
+```c++
+/*
+struct TreeNode {
+	int val;
+	struct TreeNode *left;
+	struct TreeNode *right;
+	TreeNode(int x) :
+			val(x), left(NULL), right(NULL) {
+	}
+};*/
+class Solution {
+public:
+    void dfs(TreeNode* root,int &res){
+        if(root==NULL) return;
+        depth++;
+        if(depth>res) res=depth;
+        dfs(root->left,res);
+        dfs(root->right,res);
+        depth--;
+    }
+    int TreeDepth(TreeNode* pRoot)
+    {
+        int res=0;
+        dfs(pRoot,res);
+        return res;
+    }
+private:
+    int depth=0;
+};
+```
+
+* 后序遍历的变式，递归表达式为：根节点的深度=左右子树深度较大的+1
+
+```c++
+/*
+struct TreeNode {
+	int val;
+	struct TreeNode *left;
+	struct TreeNode *right;
+	TreeNode(int x) :
+			val(x), left(NULL), right(NULL) {
+	}
+};*/
+class Solution {
+public:
+    int TreeDepth(TreeNode* pRoot)
+    {
+        if(pRoot==NULL) return 0;
+        int nleft=TreeDepth(pRoot->left);
+        int nright=TreeDepth(pRoot->right);
+        return (nleft>nright) ? (nleft+1) : (nright+1);
+    }
+};
+```
+
+#### 38 平衡二叉树
+
+输入一棵二叉树，判断该二叉树是否是平衡二叉树。
+
+* 判断深度,这种类似于先序遍历，需要递归两次；但比较好理解；
+
+```c++
+class Solution {
+public:
+    int TreeDepth(TreeNode* pRoot){
+        if(pRoot==NULL) return 0;
+        int nleft=TreeDepth(pRoot->left);
+        int nright=TreeDepth(pRoot->right);
+        return (nleft>nright)?(nleft+1):(nright+1);
+    }
+    bool IsBalanced_Solution(TreeNode* pRoot) {
+        if(pRoot==NULL) return true;
+        int nleft=TreeDepth(pRoot->left);
+        int nright=TreeDepth(pRoot->right);
+        int diff=nright-nleft;
+        if(diff>1 || diff<-1)
+            return false;
+        return IsBalanced_Solution(pRoot->left) && IsBalanced_Solution(pRoot->right);
+    }
+};
+```
+
+* 后序遍历的变式，递归表达式：判断当前节点root左右子树是否为平衡二叉树。在递归判断某节点是否为平衡二叉树时，同时记录该节点的深度。所以在root左右子树判断完后，已经知道了左右子树的深度，从而判断root是否为平衡二叉树，并记录root的深度，否则返回false。
+
+```c++
+class Solution {
+public:
+    bool IsBalanced_Solution(TreeNode* pRoot,int &depth){
+        if(pRoot==NULL){
+            depth=0;
+            return true;
+        }
+        int left,right;
+        if(IsBalanced_Solution(pRoot->left,left) && IsBalanced_Solution(pRoot->right,right)){
+            int diff=right-left;
+            if(diff<=1 && diff>=-1){
+                depth=(left>right)?(left+1):(right+1);
+                return true;
+            }
+        }
+        return false;
+    }
+    bool IsBalanced_Solution(TreeNode* pRoot) {
+        int depth=0;
+        return IsBalanced_Solution(pRoot,depth);
+    }
+};
+```
+
+#### 39数组中只出现一次的数字
+
+一个整型数组里除了两个数字之外，其他的数字都出现了两次。请写程序找出这两个只出现一次的数字。
+
+* 最简单哈希表的办法，但是基于此题特殊性，使用位运算可以节省空间；首先将数组分为两半，然后分别使用位运算得到对应的数；
 
