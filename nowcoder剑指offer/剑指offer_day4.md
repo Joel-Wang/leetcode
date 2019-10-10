@@ -118,3 +118,40 @@ public:
 };
 ```
 
+
+
+
+
+#### 35数字在排序数组中出现的次数
+
+统计一个数字在排序数组中出现的次数。
+
+* 定位到数字（可能有重复多个）最左端的二分查找的方法，即在data[mid]==k的情况下令r=mid，与data[mid]>k时相同；而data[mid]<k时令l=mid+1;
+
+```c++
+class Solution {
+public:
+    int GetNumberOfK(vector<int> data ,int k) {
+        //设计二分查找找到k的左端，然后开始向右计数,time O(logn),space O(1)
+        int l,r;
+        l=0,r=data.size()-1;
+        while(l<r){
+            int mid=l+(r-l)/2;
+            if(data[mid]>=k)
+                r=mid;
+            else
+                l=mid+1;
+        }
+        //向右计数
+        int cnt=0;
+        for(int i=l;i<data.size();i++){
+            if(data[i]==k)
+                cnt++;
+            else
+                break;
+        }
+        return cnt;
+    }
+};
+```
+
