@@ -243,6 +243,8 @@ public:
 
 #### 37二叉树的深度
 
+$\color{red}{未找到最优解}$
+
 输入一棵二叉树，求该树的深度。从根结点到叶结点依次经过的结点（含根、叶结点）形成树的一条路径，最长路径的长度为树的深度。
 
 * 二叉树递归遍历的变式1
@@ -304,6 +306,8 @@ public:
 
 #### 38 平衡二叉树
 
+$\color{red}{未做出}$
+
 输入一棵二叉树，判断该二叉树是否是平衡二叉树。
 
 * 判断深度,这种类似于先序遍历，需要递归两次；但比较好理解；
@@ -358,7 +362,78 @@ public:
 
 #### 39数组中只出现一次的数字
 
+$\color{red}{难，未做出最优解}$ 即time O(n) space O(1)
+
 一个整型数组里除了两个数字之外，其他的数字都出现了两次。请写程序找出这两个只出现一次的数字。
 
 * 最简单哈希表的办法，但是基于此题特殊性，使用位运算可以节省空间；首先将数组分为两半，然后分别使用位运算得到对应的数；
+* 第一次异或运算之后得到的num其中为1的位代表着a和b该位必然是不同的，如5(101), 6(110)异或结果为num=011。那么此时对于任意一个数，根据num为1的位是否为1，就可以将数组中的a和b分开。而又因为两个相同数字的任意一位都是相同的，所以不可能将两个相同的数字分到两个不同的组去。因此数组成功分开。
+
+
+```c++
+class Solution {
+public:
+    int FindFirstBit(int num){
+        //找到a&b最右边第一个不为1的位置；
+        int indexBit=1;
+        int i=0;
+        while(((indexBit&num)==0) && (i<32)){
+            indexBit=indexBit<<1;
+            i++;
+        }
+        return indexBit;
+    }
+    void FindNumsAppearOnce(vector<int> data,int* num1,int *num2) {
+        //找到a&b，并找到其右边第一个不为1的位置
+        int num=0;
+        for(int i=0;i<data.size();i++){
+            num=num^data[i];
+        }
+        if(num==0) return;
+        int indexBit=FindFirstBit(num);
+        //按该位置是否为1将数组分为两半，然后按照只有1个数字出现一次来算
+        *num1=*num2=0;
+        for(int i=0;i<data.size();i++){
+            if((indexBit&data[i])==0)
+                *num1^=data[i];
+            else
+                *num2^=data[i];
+        }
+    }
+};
+```
+
+#### 40和为S的连续正数序列
+
+题目描述
+
+> 小明很喜欢数学,有一天他在做数学作业时,要求计算出9~16的和,他马上就写出了正确答案是100。但是他并不满足于此,他在想究竟有多少种连续的正数序列的和为100(至少包括两个数)。没多久,他就得到另一组连续正数和为100的序列:18,19,20,21,22。现在把问题交给你,你能不能也很快的找出所有和为S的连续正数序列? Good Luck!
+
+输出描述:
+
+> 输出所有和为S的连续正数序列。序列内按照从小至大的顺序，序列间按照开始数字从小到大的顺序
+
+* 穷举，双重循环
+
+```c++
+class Solution {
+public:
+    vector<vector<int> > FindContinuousSequence(int sum) {
+        vector<vector<int> > res;
+        for(int i=1;i<=sum/2;i++){
+            vector<int> tmp;
+            int num=0;
+            for(int j=i;j<sum;j++){
+                tmp.push_back(j);
+                num+=j;
+                if(num==sum)
+                    res.push_back(tmp);
+                if(num>=sum)
+                    break;
+            }
+        }
+        return res;
+    }
+};
+```
 
