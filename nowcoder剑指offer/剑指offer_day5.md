@@ -1,4 +1,4 @@
-#### 41 和为S的两个数字
+#### 41 和为S的两个数字（面试题57）
 
 题目描述：
 
@@ -92,7 +92,7 @@ public:
 
 
 
-#### 43翻转单词顺序列
+#### 43翻转单词顺序列（面试题58，翻转字符串）
 
 牛客最近来了一个新员工Fish，每天早晨总是会拿着一本英文杂志，写些句子在本子上。同事Cat对Fish写的内容颇感兴趣，有一天他向Fish借来翻看，但却读不懂它的意思。例如，“student. a am I”。后来才意识到，这家伙原来把句子单词的顺序翻转了，正确的句子应该是“I am a student.”。Cat对一一的翻转这些单词顺序可不在行，你能帮助他么？
 
@@ -126,7 +126,7 @@ public:
 };
 ```
 
-#### 44扑克牌顺子
+#### 44扑克牌顺子（面试题61）
 
 LL今天心情特别好,因为他去买了一副扑克牌,发现里面居然有2个大王,2个小王(一副牌原本是54张^_^)...他随机从中抽出了5张牌,想测测自己的手气,看看能不能抽到顺子,如果抽到的话,他决定去买体育彩票,嘿嘿！！“红心A,黑桃3,小王,大王,方片5”,“Oh My God!”不是顺子.....LL不高兴了,他想了想,决定大\小 王可以看成任何数字,并且A看作1,J为11,Q为12,K为13。上面的5张牌就可以变成“1,2,3,4,5”(大小王分别看作2和4),“So Lucky!”。LL决定去买体育彩票啦。 现在,要求你使用这幅牌模拟上面的过程,然后告诉我们LL的运气如何， 如果牌能组成顺子就输出true，否则就输出false。为了方便起见,你可以认为大小王是0。
 
@@ -166,6 +166,93 @@ public:
             return true;
         else
             return false;
+    }
+};
+```
+
+#### 45 孩子们的游戏（圆圈中最后剩下的数字，面试题62）
+
+每年六一儿童节,牛客都会准备一些小礼物去看望孤儿院的小朋友,今年亦是如此。HF作为牛客的资深元老,自然也准备了一些小游戏。其中,有个游戏是这样的:首先,让小朋友们围成一个大圈。然后,他随机指定一个数m,让编号为0的小朋友开始报数。每次喊到m-1的那个小朋友要出列唱首歌,然后可以在礼品箱中任意的挑选礼物,并且不再回到圈中,从他的下一个小朋友开始,继续0...m-1报数....这样下去....直到剩下最后一个小朋友,可以不用表演,并且拿到牛客名贵的“名侦探柯南”典藏版(名额有限哦!!^_^)。请你试着想下,哪个小朋友会得到这份礼品呢？(注：小朋友的编号是从0到n-1)
+
+如果没有小朋友，请返回-1
+
+* 最基本的方法， 建立一个环形链表，然后模拟整个过程，最后剩下的小朋友可以拿到礼品；特殊情况没有小朋友，a. n<=0即本来就有0个小朋友；b. m<=0每次不可能有对应编号的小朋友出列；这两种情况 return -1；
+
+```c++
+struct Lists{
+    int val;
+    struct Lists* next;
+    Lists(int x): val(x),next(NULL){}
+};
+class Solution {
+public:
+    int LastRemaining_Solution(int n, int m)
+    {
+        //time O(mn) space O(n);
+        //初始化环形链表；
+        if(n<=0 || m<=0) return -1;
+        Lists *head=new Lists(0);
+        Lists *pre=head;
+        for(int i=1;i<n;i++){
+            Lists *cur=new Lists(i);
+            pre->next=cur;
+            pre=cur;
+        }
+        pre->next=head;
+        //模拟报数，直到剩下一个小朋友；
+        Lists *p=head;
+        while(p->next!=p){
+            for(int i=1;i<m-1;i++){
+                p=p->next;
+            }
+            p->next=p->next->next;
+            p=p->next;
+        }
+        return p->val;
+    }
+};
+```
+
+#### 46 求1+2+3+···+n
+
+求1+2+3+...+n，要求不能使用乘除法、for、while、if、else、switch、case等关键字及条件判断语句（A?B:C）。
+
+* 递归
+
+```c++
+class Solution {
+public:
+    int Sum_Solution(int n) {
+        if(n<=1) return n;
+        return Sum_Solution(n-1)+n;
+    }
+};
+```
+
+* 利用构造函数，相关知识参考：<https://www.cnblogs.com/joelwang/p/11693514.html>
+
+```c++
+class Temp {
+public:
+    Temp(){++N;Sum+=N;}
+    
+    static void Reset(){N=0;Sum=0;}
+    static int GetSum(){return Sum;}
+private:
+    static int N;
+    static int Sum;
+};
+int Temp::N=0;
+int Temp::Sum=0;
+
+class Solution {
+public:
+    int Sum_Solution(int n) {
+        Temp::Reset();
+        Temp* a = new Temp[n];
+        delete []a;
+        a = nullptr;
+        return Temp::GetSum();
     }
 };
 ```
