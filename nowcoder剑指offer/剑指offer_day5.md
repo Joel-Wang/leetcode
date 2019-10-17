@@ -257,3 +257,57 @@ public:
 };
 ```
 
+* 利用虚函数
+
+```c++
+class A;
+A* Array[2];
+class A{
+    public:
+    virtual int Sum(int n){
+        return 0;
+    }
+};
+class B:public A{
+    public:
+    virtual int Sum(int n){
+        return Array[!!n]->Sum(n-1)+n;
+    }
+};
+class Solution {
+public:
+    int Sum_Solution(int n) {
+        A a;
+        B b;
+        Array[0]=&a;
+        Array[1]=&b;
+        int val=Array[1]->Sum(n);
+        return val;
+    }
+};
+```
+
+#### 47 不使用加减乘除做加法
+
+写一个函数，求两个整数之和，要求在函数体内不得使用+、-、*、/四则运算符号。
+
+* 使用位运算；
+
+```c++
+class Solution {
+public:
+    int Add(int num1, int num2){
+        //分为两步：a.不进位加法（按位异或运算^）结果sum；b.记下进位（按位与运算&）结果carry；
+        //重复制导carry==0;
+        int sum, carry;
+        do{
+            sum=num1^num2;
+            carry=(num1&num2)<<1;
+            num1=sum;
+            num2=carry;
+        }while(carry!=0);
+        return sum;
+    }
+};
+```
+
