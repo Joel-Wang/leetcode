@@ -287,7 +287,7 @@ public:
 };
 ```
 
-#### 47 不使用加减乘除做加法
+#### 47 不使用加减乘除做加法（面试题65）
 
 写一个函数，求两个整数之和，要求在函数体内不得使用+、-、*、/四则运算符号。
 
@@ -307,6 +307,112 @@ public:
             num2=carry;
         }while(carry!=0);
         return sum;
+    }
+};
+```
+
+#### 48把字符串转换成整数（面试题67）
+
+题目描述
+>将一个字符串转换成一个整数，要求不能使用字符串转换整数的库函数。 数值为0或者字符串不是一个合法的数值则返回0
+
+输入描述:
+>输入一个字符串,包括数字字母符号,可以为空
+
+输出描述:
+>如果是合法的数值表达则返回该数字，否则返回0
+
+示例1
+>输入
+>+2147483647
+>1a33
+>输出
+>2147483647
+>0
+
+* 对边界情况的处理：通过 isnum是否为true，来标识是否是合法的输入（由于数字0的存在，因此要单设置一个全局变量来标识）；
+
+  1. 当输入为正常的数字和符号时判断是否非法（数字溢出或空字符，符号字符等无意义的情况）：
+
+  ​	a. 记录除符号位以外的数字部分为有效数字，假如有效数字的长度len==0则说明输入str要么为空，要么只有符号位，都是非法输入；
+
+  ​	b. 当有效数字的长度len>10则说明肯定溢出，也是非法输入；
+
+  ​	c. 当有效数字的长度len==10，但大于INT_MAX或小于INT_MIN时为非法；
+
+  2. 当输入不是数字式看做非法：当第一位输入是‘+’ ‘-’和数字以外的符号为非法，2~末位为0~9以外的符号为非法（输入掺杂字母和其他字符等的非法输入）；
+
+```c++
+bool isnum=true;//标记是否合法字符，与输入数字0相区别；
+class Solution {
+public:
+    int StrToInt(string str) {
+        //检测第一位是否符号，并获取；如果是符号则i++;
+        //考虑非法输入；考虑溢出；
+        int i=0;
+        int sign=1;
+        if(str[i]=='+' || str[i]=='-'){
+            sign=str[i]=='-'?-1:1;i++;
+        }
+        
+        int num=0;
+        
+        //判断溢出
+        string limitmax="2147483647";
+        string limitmin="2147483648";
+        int len=str.size()-i;
+        if(len>10 || len<=0) {isnum=false;return 0;}
+        if(len==10 && sign==1){
+            for(int j=0;j<10;j++){
+                if(str[i+j]<limitmax[j]) break;
+                if(str[i+j]>limitmax[j]) {isnum=false;return 0;}
+            }
+        }else if( len==10 && sign==-1){
+            for(int j=0;j<10;j++){
+                if(str[i+j]<limitmin[j]) break;
+                if(str[i+j]>limitmin[j]) {isnum=false;return 0;}
+            }
+        }
+        //转换数字
+        while(i<str.size()){
+            if(str[i]>'9' || str[i]<'0') {isnum=false;return 0;}
+            int val=str[i]-'0';
+            num=num*10+val;
+            i++;
+        }
+        return num*sign;
+    }
+};
+```
+
+#### 49数组中重复的数字
+
+在一个长度为n的数组里的所有数字都在0到n-1的范围内。 数组中某些数字是重复的，但不知道有几个数字是重复的。也不知道每个数字重复几次。请找出数组中任意一个重复的数字。 例如，如果输入长度为7的数组{2,3,1,0,2,5,3}，那么对应的输出是第一个重复的数字2。
+
+* 创建一个哈希表映射numbers[i]的值和出现的次数；
+
+```c++
+class Solution {
+public:
+    // Parameters:
+    //        numbers:     an array of integers
+    //        length:      the length of array numbers
+    //        duplication: (Output) the duplicated number in the array number
+    // Return value:       true if the input is valid, and there are some duplications in the array number
+    //                     otherwise false
+    bool duplicate(int numbers[], int length, int* duplication) {
+        int hash[length];
+        for(int i=0;i<length;i++){
+            hash[i]=0;
+        }
+        for(int i=0;i<length;i++){
+            if(hash[numbers[i]]>0){
+                *duplication=numbers[i];
+                return true;
+            }
+            hash[numbers[i]]++;
+        }
+        return false;
     }
 };
 ```
