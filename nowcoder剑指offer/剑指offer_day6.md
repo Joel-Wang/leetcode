@@ -1,34 +1,112 @@
-#### 51 正则表达式匹配
+#### 51 正则表达式匹配（面试题19）
 
 请实现一个函数用来匹配包括'.'和'*'的正则表达式。模式中的字符'.'表示任意一个字符，而'*'表示它前面的字符可以出现任意次（包含0次）。 在本题中，匹配是指字符串的所有字符匹配整个模式。例如，字符串"aaa"与模式"a.a"和"ab*ac*a"匹配，但是与"aa.a"和"ab*a"均不匹配
+
+* 使用递归的思想
+
+>解这题需要把题意仔细研究清楚，反正我试了好多次才明白的。
+>  首先，考虑特殊情况：
+>      1>两个字符串都为空，返回true
+>      2>当第一个字符串不空，而第二个字符串空了，返回false（因为这样，就无法
+>      匹配成功了,而如果第一个字符串空了，第二个字符串非空，还是可能匹配成
+>      功的，比如第二个字符串是“a*a*a*a*”,由于‘*’之前的元素可以出现0次，
+>      所以有可能匹配成功）
+>  之后就开始匹配第一个字符，这里有两种可能：匹配成功或匹配失败。但考虑到 pattern
+>  下一个字符可能是‘*’， 这里我们分两种情况讨论：pattern下一个字符为 ‘*’ 或
+>  不为 ‘*’：
+>      1> pattern下一个字符不为‘*’：这种情况比较简单，直接匹配当前字符。如果
+>       匹配成功，继续匹配下一个；如果匹配失败，直接返回false。注意这里的
+>       “匹配成功”，除了两个字符相同的情况外，还有一种情况，就是pattern的
+>        当前字符为‘.’,同时str的当前字符不为‘\0’。
+>      2> pattern下一个字符为‘*’时，稍微复杂一些，因为‘*’可以代表0个或多个。
+>        这里把这些情况都考虑到：
+>           a>当‘*’匹配0个字符时，str当前字符不变，pattern当前字符后移两位，
+>            跳过这个‘*’符号；
+>           b>当‘*’匹配1个或多个时，str当前字符移向下一个，pattern当前字符
+>            不变。（这里匹配1个或多个可以看成一种情况，因为：当匹配一个时，
+>            由于str移到了下一个字符，而pattern字符不变，就回到了上边的情况a；
+>            当匹配多于一个字符时，相当于从str的下一个字符继续开始匹配）
+>之后再写代码就很简单了。
+>
 
 ```c++
 class Solution {
 public:
     bool match(char* str, char* pattern)
     {
-        if(str==nullptr||pattern==nullptr)
-            return false;
-        return matchCore(str,pattern);
-    }
-    bool matchCore(char* str,char* pattern){
-        if(*str=='\0' && *pattern=='\0')
+        if(*str=='\0' && *pattern=='\0')//同时为空，说明匹配成功；
             return true;
-        if(*str!='\0' && *pattern!='\0')
+        if(*str!='\0' && *pattern=='\0')//字符串不为空而模式已经为空，说明匹配肯定不成功；
             return false;
+        
         if(*(pattern+1)=='*'){
-            if(*pattern==*str || (*pattern=='.'&& *str!='\0'))
-                //分别是_*代表1个字符，1个及以上字符，和零个字符的情况；
-                return matchCore(str+1,pattern+2)||matchCore(str+1,pattern)||matchCore(str,pattern+2);
+            //如果模式的下一位是*字符，那么对这种情况进行判断
+            if(*str==*pattern || (*str!='\0' && *pattern=='.'))//当str与pattern对应字符匹配时
+                //返回 匹配0个字符 || 匹配1个或多个字符
+                return match(str,pattern+2) || match(str+1,pattern);
             else
-                //由于不匹配，_*只能表示0个字符；
-                return matchCore(str,pattern+2);
+                //由于不匹配，返回匹配0个字符的结果
+                return match(str,pattern+2);
+        }else{
+            //如果模式的下一位是普通字符，那么当前字符必须匹配才有可能为true;不匹配一定为false;
+            if(*str==*pattern || (*str!='\0' && *pattern=='.'))
+                return match(str+1,pattern+1);
+            else
+                return false;
         }
-        //第二个字符非*的情况能够匹配一个字符；
-        if(*pattern==*str || (*pattern=='.' && *str!='\0'))
-            return matchCore(str+1,pattern+1);
-        return false;
     }
+};
+```
+
+#### 52 表示数值的字符串（面试题20）
+
+请实现一个函数用来判断字符串是否表示数值（包括整数和小数）。例如，字符串"+100","5e2","-123","3.1416"和"-1E-16"都表示数值。 但是"12e","1a3.14","1.2.3","+-5"和"12e+4.3"都不是。
+
+* 我的代码，纯自然语言翻译，总共判断A , A.B , .B , AeC , A.BeC , .BeC六种情况，手动判断ABC三个部分；
+
+```c++
+class Solution {
+public:
+    bool isNumeric(char* string)
+    {
+        //A , A.B , .B , AeC , A.BeC , .BeC
+        int i=0;
+        if(*string=='\0' || *string=='e' || *string=='E') return false;//e10这种算错误；
+        
+        //检测A
+        if(*(string+i)=='+'||*(string+i)=='-')
+            i++;
+        while(*(string+i)<='9' && *(string+i)>='0')
+            i++;
+        if(*(string+i)=='\0') return true;
+        if(*(string+i)!='.' && *(string+i)!='e' && *(string+i)!='E')
+            return false;
+        
+        //检测B部分
+        if(*(string+i)=='.')
+            i++;
+        while(*(string+i)<='9' && *(string+i)>='0')
+            i++;
+        if(*(string+i)=='\0') return true;
+        if(*(string+i)!='E' && *(string+i)!='e')
+            return false;
+        
+        //检测C部分
+        int flag=0;
+        if(*(string+i)=='E' || *(string+i)=='e'){
+            i++;flag=1;
+        }
+        if(*(string+i)=='+'||*(string+i)=='-')
+            i++;
+        while(*(string+i)<='9' && *(string+i)>='0'){
+            i++;flag=0;
+        }
+        if(*(string+i)=='\0' && flag==0)
+            return true;
+        else
+            return false;
+    }
+
 };
 ```
 
