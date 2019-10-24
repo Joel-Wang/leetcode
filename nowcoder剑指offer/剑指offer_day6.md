@@ -110,3 +110,126 @@ public:
 };
 ```
 
+#### 53  字符流中第一个不重复的字符 （面试题50）
+
+>请实现一个函数用来找出字符流中第一个只出现一次的字符。例如，当从字符流中只读出前两个字符"go"时，第一个只出现一次的字符是"g"。当从该字符流中读出前六个字符“google"时，第一个只出现一次的字符是"l"。
+>
+>输出描述:
+>
+>如果当前字符流没有存在出现一次的字符，返回#字符。
+>
+
+* 如果过将所有的字母存起来，并且从第一个字母开始每个与后面比较看是否出现来寻找，那么时间复杂度为O(n2）空间复杂度O(n)；
+* 现在采用一个256长度的哈希表，下标表示字符，value值有3种状态；为-1表示从未出现过，为-2表示已经出现过两次，为0~index表示出现过1次，并且出现的位置是value的值。这样inset为O(1)，search 的时间为O(1)；整体的时间复杂度O(n), 空间复杂度O(1);
+
+```c++
+class Solution
+{
+public:
+  //Insert one char from stringstream
+    Solution(){
+        for(int i=0;i<256;i++)
+            hash[i]=-1;
+        index=0;
+    }
+    void Insert(char ch)
+    {
+        index++;
+        int id=ch;
+        if(hash[id]==-1)
+            hash[id]=index;
+        else
+            hash[id]=-2;
+    }
+  //return the first appearence once char in current stringstream
+    char FirstAppearingOnce()
+    {
+        int id=index+1;
+        char res=-1;
+        for(int i=0;i<256;i++){
+            if(hash[i]>=0 && hash[i]<id){
+                id=hash[i],res=i;
+            }
+        }
+        if(res==-1)
+            return '#';
+        else
+            return res;
+    }
+private:
+    int index;//表示输入到第index个字符
+    int hash[256];
+};
+```
+
+#### 54 环形链表的入口结点
+
+给一个链表，若其中包含环，请找出该链表的环的入口结点，否则，输出null。
+
+```c++
+/*
+struct ListNode {
+    int val;
+    struct ListNode *next;
+    ListNode(int x) :
+        val(x), next(NULL) {
+    }
+};
+*/
+class Solution {
+public:
+    ListNode* EntryNodeOfLoop(ListNode* pHead)
+    {
+        set<ListNode*> s;
+        ListNode* p=pHead;
+        while(p!=NULL && s.count(p)==0){
+            s.insert(p);
+            p=p->next;
+        }
+        return p;
+    }
+};
+```
+
+#### 55删除链表重复结点
+
+> 在一个排序的链表中，存在重复的结点，请删除该链表中重复的结点，重复的结点不保留，返回链表头指针。 例如，链表1->2->3->3->4->4->5 处理后为 1->2->5
+
+
+
+
+
+> 变式：删除重复结点中多余的节点，如1->2->3->3->4->4->5 处理后为 1->2->3->4->5
+
+```c++
+/*
+struct ListNode {
+    int val;
+    struct ListNode *next;
+    ListNode(int x) :
+        val(x), next(NULL) {
+    }
+};
+*/
+class Solution {
+public:
+    ListNode* deleteDuplication(ListNode* pHead)
+    {
+        if(pHead==NULL || pHead->next==NULL) return pHead;
+        ListNode* p=pHead->next;
+        ListNode* pre=pHead;
+        while(p!=NULL){
+            if(pre->val==p->val){
+                pre->next=p->next;
+                delete p;
+                p=pre->next;
+            }else{
+                pre=p;
+                p=p->next;
+            }
+        }
+        return pHead;
+    }
+};
+```
+
