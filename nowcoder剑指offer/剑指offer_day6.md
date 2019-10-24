@@ -191,13 +191,53 @@ public:
 };
 ```
 
-#### 55删除链表重复结点
+#### 55删除链表重复结点（面试题18，题目二）
 
 > 在一个排序的链表中，存在重复的结点，请删除该链表中重复的结点，重复的结点不保留，返回链表头指针。 例如，链表1->2->3->3->4->4->5 处理后为 1->2->5
 
+* 用pre记录当前节点的前驱，如果当前节点p重复，那么就删除所有与当前节点值相同的相邻节点，然后让pre指向下一个节点。由于头结点也可能会重复，因此初始化pre 为-1，指向pHead; 
 
-
-
+```c++
+/*
+struct ListNode {
+    int val;
+    struct ListNode *next;
+    ListNode(int x) :
+        val(x), next(NULL) {
+    }
+};
+*/
+class Solution {
+public:
+    ListNode* deleteDuplication(ListNode* pHead)
+    {
+        if(pHead==NULL || pHead->next==NULL) return pHead;
+        int flag=1;
+        ListNode* pre=new ListNode(-1);
+        ListNode* pnewHead, *p;
+        pnewHead=pre,p=pHead;
+        pre->next=p;
+        while(p!=NULL){
+            //如果当前节点重复，那么删除，直到p为空或者p-val不再是重复值；
+            if(p->next!=NULL && p->val==p->next->val){
+                int v=p->val;
+                while(p!=NULL && v==p->val){
+                    ListNode* tmp=p->next;
+                    delete p;
+                    p=tmp;
+                }
+                pre->next=p;
+            }else{
+            //如果当前节点不重复，直接将pre和p向后移一位；
+                pre=p;p=p->next;
+            }
+        }
+        ListNode* res=pnewHead->next;
+        delete pnewHead;
+        return res;
+    }
+};
+```
 
 > 变式：删除重复结点中多余的节点，如1->2->3->3->4->4->5 处理后为 1->2->3->4->5
 
@@ -229,6 +269,49 @@ public:
             }
         }
         return pHead;
+    }
+};
+```
+
+#### 56 二叉树的下一个节点
+
+给定一个二叉树和其中的一个结点，请找出中序遍历顺序的下一个结点并且返回。注意，树中的结点不仅包含左右子结点，同时包含指向父结点的指针。
+
+* 按中序遍历递归和回溯两种情况分别求next值，具体见代码
+
+```c++
+/*
+struct TreeLinkNode {
+    int val;
+    struct TreeLinkNode *left;
+    struct TreeLinkNode *right;
+    struct TreeLinkNode *next;
+    TreeLinkNode(int x) :val(x), left(NULL), right(NULL), next(NULL) {
+        
+    }
+};
+*/
+class Solution {
+public:
+    TreeLinkNode* GetNext(TreeLinkNode* pNode)
+    {
+        //由于中序遍历根节点的下一个节点一定在右子树里（假设存在），因此按照有无右子树划分为两种情况分别处理；
+        if(pNode==NULL || (pNode->left==NULL && pNode->right==NULL && pNode->next==NULL)) return NULL;
+        TreeLinkNode* pNext=NULL;
+        if(pNode->right==NULL){
+            //如果右子树为空，那么pNode下一个节点应该为父节点pFather，且这个父节点的左孩子为pNode;如果不满足则向上回溯；
+            pNext=pNode->next;
+            while(pNext!=NULL && pNext->right==pNode){
+                pNode=pNext;
+                pNext=pNode->next;
+            }
+        }else{
+            //右子树不为空，next节点应为右孩子的最底层的左孩子；
+            pNext=pNode->right;
+            while(pNext->left!=NULL)
+                pNext=pNext->left;
+        }
+        return pNext;
     }
 };
 ```
