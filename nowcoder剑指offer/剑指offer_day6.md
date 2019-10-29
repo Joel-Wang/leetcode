@@ -1,5 +1,7 @@
 #### 51 正则表达式匹配（面试题19）
 
+*hard* *好几次了都没熟练*
+
 请实现一个函数用来匹配包括'.'和'*'的正则表达式。模式中的字符'.'表示任意一个字符，而'*'表示它前面的字符可以出现任意次（包含0次）。 在本题中，匹配是指字符串的所有字符匹配整个模式。例如，字符串"aaa"与模式"a.a"和"ab*ac*a"匹配，但是与"aa.a"和"ab*a"均不匹配
 
 * 使用递归的思想
@@ -60,6 +62,8 @@ public:
 
 #### 52 表示数值的字符串（面试题20）
 
+*hard* *看了提示做出来，代码较为繁琐*
+
 请实现一个函数用来判断字符串是否表示数值（包括整数和小数）。例如，字符串"+100","5e2","-123","3.1416"和"-1E-16"都表示数值。 但是"12e","1a3.14","1.2.3","+-5"和"12e+4.3"都不是。
 
 * 我的代码，纯自然语言翻译，总共判断A , A.B , .B , AeC , A.BeC , .BeC六种情况，手动判断ABC三个部分；
@@ -111,6 +115,8 @@ public:
 ```
 
 #### 53  字符流中第一个不重复的字符 （面试题50）
+
+*hard* *花费时间较长，且很久之前看过类似的题*
 
 >请实现一个函数用来找出字符流中第一个只出现一次的字符。例如，当从字符流中只读出前两个字符"go"时，第一个只出现一次的字符是"g"。当从该字符流中读出前六个字符“google"时，第一个只出现一次的字符是"l"。
 >
@@ -164,6 +170,8 @@ private:
 
 #### 54 环形链表的入口结点
 
+*medium* *直接使用set，似乎不是最优解*
+
 给一个链表，若其中包含环，请找出该链表的环的入口结点，否则，输出null。
 
 ```c++
@@ -192,6 +200,8 @@ public:
 ```
 
 #### 55删除链表重复结点（面试题18，题目二）
+
+*medium* *花费时间稍长*
 
 > 在一个排序的链表中，存在重复的结点，请删除该链表中重复的结点，重复的结点不保留，返回链表头指针。 例如，链表1->2->3->3->4->4->5 处理后为 1->2->5
 
@@ -239,7 +249,7 @@ public:
 };
 ```
 
-> 变式：删除重复结点中多余的节点，如1->2->3->3->4->4->5 处理后为 1->2->3->4->5
+* **变式：** 删除重复结点中多余的节点，如1->2->3->3->4->4->5 处理后为 1->2->3->4->5
 
 ```c++
 /*
@@ -274,6 +284,8 @@ public:
 ```
 
 #### 56 二叉树的下一个节点
+
+*hard* *花费了较长时间*
 
 给定一个二叉树和其中的一个结点，请找出中序遍历顺序的下一个结点并且返回。注意，树中的结点不仅包含左右子结点，同时包含指向父结点的指针。
 
@@ -316,9 +328,9 @@ public:
 };
 ```
 
-#### 57 对称的二叉树
+#### 57 对称的二叉树（面试题28）
 
-*未做出最优解*
+*hard* *未做出最优解*
 
 请实现一个函数，用来判断一颗二叉树是不是对称的。注意，如果一个二叉树同此二叉树的镜像是同样的，定义其为对称的。
 
@@ -403,6 +415,108 @@ public:
             return false;
     }
 
+};
+```
+
+#### 58 按之字顺序打印二叉树
+
+*medium* *较为熟练*
+
+请实现一个函数按照之字形打印二叉树，即第一行按照从左到右的顺序打印，第二层按照从右至左的顺序打印，第三行按照从左到右的顺序打印，其他行以此类推。
+
+* 采用栈
+
+```c++
+/*
+struct TreeNode {
+    int val;
+    struct TreeNode *left;
+    struct TreeNode *right;
+    TreeNode(int x) :
+            val(x), left(NULL), right(NULL) {
+    }
+};
+*/
+class Solution {
+public:
+    vector<vector<int> > Print(TreeNode* pRoot) {
+        if(pRoot==NULL) return {};
+        vector<vector<int> > res;
+        queue<TreeNode*> q;
+        q.push(pRoot);
+        int SignOfLine=1;
+        while(!q.empty()){
+            int len=q.size();
+            SignOfLine*=-1;
+            vector<int> level;
+            stack<int> s;
+            for(int i=0;i<len;i++){
+                TreeNode* tmp=q.front();
+                q.pop();
+                if(tmp->left!=NULL)
+                    q.push(tmp->left);
+                if(tmp->right!=NULL)
+                    q.push(tmp->right);
+                if(SignOfLine==1)
+                    s.push(tmp->val);
+                else
+                    level.push_back(tmp->val);
+            }
+            //当SignOfLine==1时，栈s才非空
+            while(!s.empty()){
+                level.push_back(s.top());
+                s.pop();
+            }
+            res.push_back(level);
+        }
+        return res;
+    }
+    
+};
+```
+
+#### 60 二叉树打印多行
+
+*easy* *很熟练*
+
+从上到下按层打印二叉树，同一层结点从左至右输出。每一层输出一行。
+
+* 层序遍历
+
+```c++
+/*
+struct TreeNode {
+    int val;
+    struct TreeNode *left;
+    struct TreeNode *right;
+    TreeNode(int x) :
+            val(x), left(NULL), right(NULL) {
+    }
+};
+*/
+class Solution {
+public:
+        vector<vector<int> > Print(TreeNode* pRoot) {
+            //层序遍历
+            if(pRoot==NULL) return {};
+            queue<TreeNode*> q;
+            q.push(pRoot);
+            vector<vector<int> > res;
+            while(!q.empty()){
+                int len=q.size();
+                vector<int> level;
+                for(int i=0;i<len;i++){
+                    TreeNode* cur=q.front();
+                    q.pop();
+                    level.push_back(cur->val);
+                    if(cur->left!=NULL) q.push(cur->left);
+                    if(cur->right!=NULL) q.push(cur->right);
+                }
+                res.push_back(level);
+            }
+            return res;
+        }
+    
 };
 ```
 
