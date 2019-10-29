@@ -316,3 +316,93 @@ public:
 };
 ```
 
+#### 57 对称的二叉树
+
+*未做出最优解*
+
+请实现一个函数，用来判断一颗二叉树是不是对称的。注意，如果一个二叉树同此二叉树的镜像是同样的，定义其为对称的。
+
+* **思路：** 采用‘#’来代替层序遍历的空字符，然后对每一层检测对称性。当上一层对称时，下一层必须对称才能是二叉树对称，否则二叉树不对称；
+
+```c++
+/*
+struct TreeNode {
+    int val;
+    struct TreeNode *left;
+    struct TreeNode *right;
+    TreeNode(int x) :
+            val(x), left(NULL), right(NULL) {
+    }
+};
+*/
+class Solution {
+public:
+    bool isSymmetrical(TreeNode* pRoot)
+    {
+        //层序遍历，带着空字符
+        if(pRoot==NULL) return true;
+        queue<TreeNode*> q;
+        q.push(pRoot);
+        while(!q.empty()){
+            int len=q.size();
+            string str="";
+            for(int i=0;i<len;i++){
+                TreeNode* curNode=q.front();
+                q.pop();
+                if(curNode!=NULL){
+                    q.push(curNode->left);
+                    q.push(curNode->right);
+                    str.push_back(curNode->val+'0');
+                }else{
+                    str.push_back('#');
+                }
+            }
+            int l=0;int r=str.size()-1;
+            while(l<r){
+                if(str[l++]!=str[r--]) return false;
+            }
+        }
+        return true;
+    }
+
+};
+```
+
+* **递归** 找到递归子结构，即比较左右两个子节点得值，如果相等，递归比较左节点的左孩子与右节点的右孩子，左节点的右孩子和右节点的左孩子；
+
+```c++
+/*
+struct TreeNode {
+    int val;
+    struct TreeNode *left;
+    struct TreeNode *right;
+    TreeNode(int x) :
+            val(x), left(NULL), right(NULL) {
+    }
+};
+*/
+class Solution {
+public:
+    bool isSymmetrical(TreeNode* pRoot)
+    {
+        //找到递归子结构
+        if(pRoot==NULL)
+            return true;
+        else
+            return isSymmetrical(pRoot->left,pRoot->right);
+    }
+    bool isSymmetrical(TreeNode* pleft,TreeNode* pright){
+        //左右孩子同时为空，空节点对称
+        if(pleft==NULL && pright==NULL) return true;
+        //左右一个为空一个不为空，则一定不对称
+        if(!(pleft!=NULL && pright!=NULL)) return false;
+        //左右节点值相等，则比较右节点的右孩子，左节点的左孩子；右节点的左孩子，左节点的右孩子；取与；
+        if(pleft->val==pright->val)
+            return isSymmetrical(pleft->left,pright->right) && isSymmetrical(pleft->right,pright->left);
+        else
+            return false;
+    }
+
+};
+```
+
