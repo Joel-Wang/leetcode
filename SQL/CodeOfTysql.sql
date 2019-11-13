@@ -219,6 +219,169 @@ VALUES('1000000006' ,
        'USA', 
        NULL, 
        NULL);*/
+-- 插入部分行
+/*
+INSERT INTO customers(cust_id,
+					  cust_name,
+                      cust_address,
+                      cust_city,
+                      cust_state,
+                      cust_zip,
+                      cust_country)
+VALUES('1000000007',
+       'Joel Wang',
+       'Friendship Street',
+       'Xian',
+       'SX',
+       '55555',
+       'CN');*/
+#SELECT * FROM customers;
 
-SELECT * FROM customers;
+#CREATE TABLE custcopy AS SELECT * FROM customers;
+#SELECT * FROM custcopy;
 
+#lesson16 更新和删除数据
+-- 更新
+/*
+UPDATE customers
+SET cust_email = 'kim@thetoystore.com'
+WHERE cust_id='1000000005';
+
+SELECT * FROM customers;*/
+
+/*
+UPDATE customers
+SET cust_contact = 'Sam Roberts',
+    cust_email = 'sam@toyland.com'
+WHERE cust_id = '1000000006';
+
+SELECT * FROM customers;*/
+
+-- 删除
+/*
+DELETE FROM customers
+WHERE cust_id = '1000000006';
+SELECT * FROM customers;*/
+
+#lesson17 创建操作表
+-- 创建表
+-- 创建products2
+/*
+CREATE TABLE tmp
+(
+    prod_id			CHAR(10)		NOT NULL,
+    vend_id			CHAR(10)		NOT NULL,
+    prod_name		CHAR(254)		NOT NULL,
+    prod_price		DECIMAL(8,2)	NOT NULL,
+    prod_desc		VARCHAR(1000)	NULL
+);
+SELECT * FROM tmp;*/
+/*
+CREATE TABLE products2
+(
+    prod_id			CHAR(10)		NOT NULL,
+    vend_id			CHAR(10)		NOT NULL,
+    prod_name		CHAR(254)		NOT NULL,
+    prod_price		DECIMAL(8,2)	NOT NULL,
+    prod_desc		VARCHAR(1000)	NULL
+);
+SELECT * FROM products2;*/
+
+-- 创建orders2
+/*
+CREATE TABLE orders2
+(
+	order_num		INTEGER		NOT NULL,
+    order_date		DATETIME	NOT NULL,
+    cust_id			CHAR(10)	NOT NULL
+);
+SELECT * FROM orders2;*/
+
+-- 创建vendors2
+/*
+CREATE TABLE vendors2
+(
+	vend_id			CHAR(10)		NOT NULL,
+    vend_name		CHAR(50)		NOT NULL,
+    vend_address	CHAR(50)		,
+    vend_city		CHAR(50)		,
+    vend_state		CHAR(5)			,
+    vend_zip		CHAR(10)		,
+    vend_country	CHAR(50)		
+);
+SELECT * FROM vendors2;*/
+
+-- 创建orderitems2
+/*
+CREATE TABLE orderitems2
+(
+	order_num		INTEGER			NOT NULL,
+    order_item		INTEGER			NOT NULL,
+    prod_id			CHAR(10)		NOT NULL,
+    quantity		INTEGER			NOT NULL		DEFAULT 1,
+    item_price		DECIMAL(8,2)	NOT NULL
+);
+SELECT * FROM orderitems2;*/
+
+-- vendors2增加vend_phone列
+#SELECT * FROM vendors2;
+/*
+ALTER TABLE vendors2
+ADD vend_phone CHAR(20);
+SELECT * FROM vendors2;*/
+/*
+ALTER TABLE vendors2
+DROP COLUMN vend_phone;
+SELECT * FROM vendors2;*/
+
+#lesson18 视图
+-- 创建视图
+/*
+CREATE VIEW ProductsCustomers AS
+SELECT cust_name, cust_contact, prod_id
+FROM customers,orders,orderitems
+WHERE customers.cust_id = orders.cust_id
+AND orderitems.order_num = orders.order_num;*/
+
+#SELECT * FROM productscustomers;
+
+/*SELECT cust_name, cust_contact
+FROM ProductsCustomers
+WHERE prod_id = 'RGAN01';*/
+
+-- 视图过滤
+/*
+CREATE VIEW CustomerEmailList AS
+SELECT cust_id,cust_name, cust_email
+FROM customers
+WHERE cust_email IS NOT NULL;
+SELECT * FROM customeremailList;*/
+
+-- 视图与计算字段
+/*
+CREATE VIEW OrderItemsExpanded AS
+SELECT prod_id,
+	   quantity,
+       item_price,
+       quantity*item_price AS expanded_price
+FROM orderitems
+WHERE order_num=20008;
+SELECT *FROM orderitemsexpanded;*/
+
+#lesson19 存储过程
+#MySQL 似乎不能直接执行；
+/*EXECUTE AddNewProduct('JTS01'
+					  'Stuffed Eiffel Tower',
+                      6.49,
+                      'Plush stuffed toy with the text La Tour Eiffel in red white and blue');
+#SELECT * FROM products;*/
+
+#lesson 20 控制事物处理
+#MySQL 似乎不能直接执行；
+/*DROP TABLE orders2;*/
+#DROP TABLE vendors2;
+#ROLLBACK;
+
+/*SET TRANSACTION
+DELETE orderitems2 WHERE order_num = 12345;
+COMMIT;*/
